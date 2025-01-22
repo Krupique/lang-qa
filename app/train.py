@@ -51,13 +51,12 @@ class LangQA():
         return peft_config
 
 
-
     def create_model(self):
         # Defining the BitsAndBytes config
         bnb_config = self.set_bitsandbytes(self.config["BitsAndBytesConfig"])
 
         # LLM
-        llm_name = "NousResearch/Llama-2-7b-chat-hf"
+        llm_name = config["llm"]
         # Load the tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(llm_name)
         # Use the EOS token from the tokenizer to pad at the end of each sequence
@@ -97,11 +96,6 @@ class LangQA():
         return training_arguments
 
 
-    ## To do: To create trainer
-    def create_trainer(self):
-        pass
-
-
     def load_dataset(self):
         self.dataset = load_dataset('nlpie/Llama2-MedTuned-Instructions')
         self.train_data = self.dataset['train'].select(indices=range(1000))
@@ -109,12 +103,27 @@ class LangQA():
         self.test_data = self.dataset['train'].select(indices=range(1000, 1200))
 
 
+    def create_trainer(self):
+        training_arguments = self.set_training_arguments(config["TrainingArguments"])
+
+        # Creates the Trainer
+        # Optimized for fine-tuning pre-trained models with smaller datasets on supervised learning tasks.
+        self.trainer = SFTTrainer(model = self.model,
+                            peft_config = self.peft_config,
+                            #  max_seq_length = 512,
+                            tokenizer = self.tokenizer,
+                            #  packing = True,
+                            formatting_func = create_prompt,
+                            args = training_arguments,
+                            train_dataset = self.train_data,
+                            eval_dataset = self.test_data)
+
+
     def train(self):
-        pass
+        self.trainer.train()
 
-
-
-
+        # Model save
+        self.trainer.save_model('models/final_model')
 
 
 if __name__ == "__main__":
