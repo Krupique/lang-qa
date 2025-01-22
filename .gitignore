@@ -1,3 +1,5 @@
 ignore/
 notebooks/adjusted_model
 notebooks/final_model
+.venv/
+app/utils/__pycache__/
