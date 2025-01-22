@@ -70,11 +70,11 @@ class LangQA():
                                                     device_map = "auto",
                                                     use_cache = False)
 
-        peft_config = self.set_lora(self.config["LoraConfig"])
+        self.peft_config = self.set_lora(self.config["LoraConfig"])
         # Prepare the model to  train
         self.model = prepare_model_for_kbit_training(self.model)
         # Merge the quantized model with the LoRa adapters
-        self.model = get_peft_model(self.model, peft_config=peft_config)
+        self.model = get_peft_model(self.model, peft_config=self.peft_config)
 
         print(self.model)
 
@@ -135,5 +135,7 @@ if __name__ == "__main__":
 
     langqa = LangQA(config)
     langqa.create_model()
+    langqa.load_dataset()
+    langqa.create_trainer()
 
     print('Chegou até aqui')
