@@ -76,8 +76,6 @@ class LangQA():
         # Merge the quantized model with the LoRa adapters
         self.model = get_peft_model(self.model, peft_config=self.peft_config)
 
-        print(self.model)
-
 
     def set_training_arguments(self, config):
         output_model = 'models/adjusted_model'
@@ -137,5 +135,6 @@ if __name__ == "__main__":
     langqa.create_model()
     langqa.load_dataset()
     langqa.create_trainer()
+    langqa.train()
 
     print('Chegou até aqui')
